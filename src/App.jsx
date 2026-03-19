@@ -1,7 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY;
 const today = new Date().toISOString().slice(0, 10);
 
 const C = {
@@ -55,30 +53,20 @@ STYLE: concise, smart, conversational, trader-facing.
 `;
 
 async function supabaseQuery(table, search) {
-  const searchCol = table === "color" ? "Property" : table === "axes" ? "Summary" : "Name";
-  const url = `${SUPABASE_URL}/rest/v1/${table}?${searchCol}=ilike.*${encodeURIComponent(search)}*&limit=10`;
-
-  const res = await fetch(url, {
-    headers: {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-      "Content-Type": "application/json",
-    },
+  const res = await fetch("/api/chat", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type: "supabase_query", table, search }),
   });
   if (!res.ok) return [];
   return res.json();
 }
 
 async function supabaseInsert(table, row) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/${table}`, {
+  const res = await fetch("/api/chat", {
     method: "POST",
-    headers: {
-      apikey: SUPABASE_KEY,
-      Authorization: `Bearer ${SUPABASE_KEY}`,
-      "Content-Type": "application/json",
-      Prefer: "return=minimal",
-    },
-    body: JSON.stringify(row),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ type: "supabase_insert", table, row }),
   });
   return res.ok;
 }
@@ -152,7 +140,7 @@ export default function App() {
       let dbContext = "";
 
       if (intent === "SEARCH") {
-        const term = trimmed.replace(/^(search|color on|anything on|what do we have on):?\s*/i, "").trim();
+        const term = trimmed.replace(/^(search|color on|anything on|what do we have on|what color do we have on):?\s*/i, "").trim();
         const [colorRows, axesRows, historyRows] = await Promise.all([
           supabaseQuery("color", term),
           supabaseQuery("axes", term),
@@ -279,4 +267,3 @@ export default function App() {
     </div>
   );
 }
-
