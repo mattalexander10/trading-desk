@@ -88,7 +88,7 @@ function classifyIntent(input) {
   if (!l) return "CHAT";
   if (/^(color:|color\s+[a-z0-9])/i.test(input) || /\b(add color|log color|save color)\b/i.test(l)) return "COLOR_ENTRY";
   if (/^(axes:|axe:|live axes?:?)/i.test(input) || /\b(add axes|log axes|save axes|live axe)\b/i.test(l)) return "AXES_ENTRY";
-  if (/\b(search|look up|find|show me|check|color on|anything on|what do we have)\b/i.test(l) || /^[0-9A-Z]{6,9}$/i.test(input.trim())) return "SEARCH";
+  if (/\b(search|look up|find|show me|check|color on|anything on|what do we have|what color|any color|any axes|any history)\b/i.test(l) || /^[0-9A-Z]{6,9}$/i.test(input.trim())) return "SEARCH";
   return "CHAT";
 }
 
